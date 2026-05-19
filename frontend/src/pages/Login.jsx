@@ -142,7 +142,11 @@ export default function Login() {
           </form>
 
           <div className="text-center text-[11px] text-slate-500 pt-4 font-normal bg-slate-50 rounded-lg mt-3 py-2 border border-dashed border-slate-200">
+<<<<<<< HEAD
             <div>Akun Demo Aktif:</div>
+=======
+            <div>Akun Demo yang Aktif:</div>
+>>>>>>> c74fb7d6a04640213b954423dbbbdf2022484ca2
             <div className="text-slate-700 mt-0.5">
               <span className="font-bold">{email}</span> / <span className="font-bold">{password}</span>
             </div>
