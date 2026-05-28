@@ -50,16 +50,28 @@ function AppRoutes() {
       {/* Landing Page */}
       <Route
         path="/"
-        element={user ? <Navigate to={home} replace /> : <LandingPage />}
+        element={
+          user ? (
+            <Navigate to={home} replace />
+          ) : (
+            <LandingPage />
+          )
+        }
       />
 
       {/* Login */}
       <Route
         path="/login"
-        element={user ? <Navigate to={home} replace /> : <Login />}
+        element={
+          user ? (
+            <Navigate to={home} replace />
+          ) : (
+            <Login />
+          )
+        }
       />
 
-      {/* Student */}
+      {/* Student Routes */}
       <Route
         path="/faq"
         element={
@@ -141,7 +153,7 @@ function AppRoutes() {
         }
       />
 
-      {/* Staff */}
+      {/* Staff Routes */}
       <Route
         path="/staff/dashboard"
         element={
@@ -187,7 +199,7 @@ function AppRoutes() {
         }
       />
 
-      {/* Admin */}
+      {/* Admin Routes */}
       <Route
         path="/admin/dashboard"
         element={
