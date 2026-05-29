@@ -9,4 +9,12 @@ class Category(Base):
     id = Column(Integer, primary_key=True, index=True)
     name = Column(String, unique=True, nullable=False)
     description = Column(Text, nullable=True)
+    
+    # New fields for frontend alignment
+    icon = Column(String, default="📄", nullable=False)
+    bg_color = Column(String, default="#F1EFE8", nullable=False)
+    type = Column(String, default="manual", nullable=False)  # 'manual' or 'generate'
+    template = Column(Text, nullable=True)
+    ttd = Column(String, nullable=True)
+
     created_at = Column(DateTime(timezone=True), server_default=func.now())

@@ -1,6 +1,6 @@
 from pydantic import BaseModel
-from typing import Optional
-from datetime import datetime
+from typing import Optional, Dict, Any
+from datetime import datetime, date
 from app.models.enums import TicketStatus, TicketPriority, UserRole
 
 
@@ -11,12 +11,16 @@ class TicketCreate(BaseModel):
     description: str
     category_id: Optional[int] = None
     priority: Optional[TicketPriority] = TicketPriority.medium
+    deadline: Optional[date] = None
+    form_data: Optional[Dict[str, Any]] = None
 
 
 class TicketUpdate(BaseModel):
     status: Optional[TicketStatus] = None
     priority: Optional[TicketPriority] = None
     assigned_to: Optional[int] = None
+    deadline: Optional[date] = None
+    form_data: Optional[Dict[str, Any]] = None
 
 
 class TicketBrief(BaseModel):
@@ -28,6 +32,8 @@ class TicketBrief(BaseModel):
     category_id: Optional[int] = None
     created_by: int
     assigned_to: Optional[int] = None
+    deadline: Optional[date] = None
+    form_data: Optional[Dict[str, Any]] = None
     created_at: Optional[datetime] = None
     updated_at: Optional[datetime] = None
 
@@ -79,6 +85,8 @@ class TicketResponse(BaseModel):
     creator_name: Optional[str] = None
     assigned_to: Optional[int] = None
     assignee_name: Optional[str] = None
+    deadline: Optional[date] = None
+    form_data: Optional[Dict[str, Any]] = None
     created_at: Optional[datetime] = None
     updated_at: Optional[datetime] = None
     notes: list[TicketNoteResponse] = []

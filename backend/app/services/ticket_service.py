@@ -19,6 +19,8 @@ class TicketService:
             description=payload.description,
             category_id=payload.category_id,
             priority=payload.priority,
+            deadline=payload.deadline,
+            form_data=payload.form_data,
             created_by=user.id,
         )
         self.db.add(ticket)
