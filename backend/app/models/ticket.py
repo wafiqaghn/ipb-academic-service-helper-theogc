@@ -27,3 +27,15 @@ class Ticket(Base):
     category = relationship("Category", lazy="joined")
     notes = relationship("TicketNote", back_populates="ticket", lazy="joined")
     attachments = relationship("Attachment", back_populates="ticket", lazy="joined")
+
+    @property
+    def nama(self):
+        return self.student.nama if self.student else None
+
+    @property
+    def nim_or_nip(self):
+        return self.student.nim_or_nip if self.student else None
+
+    @property
+    def nama_kategori(self):
+        return self.category.nama_kategori if self.category else None

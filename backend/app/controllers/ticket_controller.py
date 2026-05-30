@@ -48,13 +48,18 @@ def get_my_tickets(
         raise HTTPException(status_code=500, detail=f"Database error: {str(e)}")
 
 
+from sqlalchemy.orm import joinedload
+
 @router.get("/all", response_model=List[TicketBrief])
 def get_all_tickets(
     _: User = Depends(require_roles(UserRole.staff, UserRole.admin)),
     db: Session = Depends(get_db),
 ):
     try:
-        tickets = db.query(Ticket).all()
+        tickets = db.query(Ticket).options(
+            joinedload(Ticket.student),
+            joinedload(Ticket.category)
+        ).all()
         return tickets
     except SQLAlchemyError as e:
         raise HTTPException(status_code=500, detail=f"Database error: {str(e)}")

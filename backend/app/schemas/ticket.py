@@ -33,6 +33,9 @@ class TicketBrief(BaseModel):
     form_data: Optional[Dict[str, Any]] = None
     created_at: Optional[datetime] = None
     updated_at: Optional[datetime] = None
+    nama: Optional[str] = None
+    nim_or_nip: Optional[str] = None
+    nama_kategori: Optional[str] = None
 
     class Config:
         from_attributes = True
