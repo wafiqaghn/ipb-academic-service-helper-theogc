@@ -4,8 +4,6 @@ from datetime import datetime, date
 from app.models.enums import TicketStatus, TicketPriority, UserRole
 
 
-# ── Ticket ──────────────────────────────────────────────
-
 class TicketCreate(BaseModel):
     subject: str
     description: str
@@ -24,7 +22,6 @@ class TicketUpdate(BaseModel):
 
 
 class TicketBrief(BaseModel):
-    """Lightweight ticket representation for list views."""
     id: int
     subject: str
     status: TicketStatus
@@ -40,8 +37,6 @@ class TicketBrief(BaseModel):
     class Config:
         from_attributes = True
 
-
-# ── Ticket Notes ────────────────────────────────────────
 
 class TicketNoteCreate(BaseModel):
     content: str
@@ -59,8 +54,6 @@ class TicketNoteResponse(BaseModel):
         from_attributes = True
 
 
-# ── Attachment ──────────────────────────────────────────
-
 class AttachmentResponse(BaseModel):
     id: int
     ticket_id: int
@@ -71,8 +64,6 @@ class AttachmentResponse(BaseModel):
     class Config:
         from_attributes = True
 
-
-# ── Full Ticket Detail ─────────────────────────────────
 
 class TicketResponse(BaseModel):
     id: int
