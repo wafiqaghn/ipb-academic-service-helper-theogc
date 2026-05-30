@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { useAuth } from '@/contexts/AuthContext'
+import { useAuth } from '@/context/AuthContext'
 import Button from '@/components/ui/Button'
 import logoIpb from '@/assets/logo-ipb.png'
 
@@ -36,35 +36,17 @@ export default function Login() {
     setLoading(true)
     setErrorMsg('')
 
-    const roleKey = role === 'staff' ? 'staff' : role === 'admin' ? 'admin' : 'student'
-
     try {
-      await new Promise((resolve) => setTimeout(resolve, 500))
-
-      let isValid = false
-      if (role === 'mahasiswa' && email === 'quina@apps.ipb.ac.id' && password === 'Password123!') {
-        isValid = true
-      } else if (role === 'staff' && email === 'staff@apps.ipb.ac.id' && password === 'Password123!') {
-        isValid = true
-      } else if (role === 'admin' && email === 'admin@apps.ipb.ac.id' && password === 'Password123!') {
-        isValid = true
-      }
-
-      if (isValid) {
-        if (login) {
-          const mockToken = "mock-jwt-token-for-demo-bypass"
-          await login(mockToken, roleKey, email)
-        }
-
-        if (roleKey === 'staff') navigate('/staff/dashboard')
-        else if (roleKey === 'admin') navigate('/admin/dashboard')
+      if (login) {
+        const user = await login(email, password)
+        const userRole = user.role
+        
+        if (userRole === 'staff') navigate('/staff/dashboard')
+        else if (userRole === 'admin') navigate('/admin/dashboard')
         else navigate('/faq')
-      } else {
-        throw new Error(`Login gagal. Kredensial untuk role ${role} salah.`)
       }
-
     } catch (e) {
-      setErrorMsg(e.message || 'Terjadi kesalahan pada sistem login.')
+      setErrorMsg(e.response?.data?.detail || e.message || 'Terjadi kesalahan pada sistem login.')
     } finally {
       setLoading(false)
     }

@@ -4,7 +4,7 @@ import Button from '@/components/ui/Button'
 import Badge from '@/components/ui/Badge'
 import StatCard from '@/components/ui/StatCard'
 import { Input, FormGroup } from '@/components/ui/Input'
-import { useAuth } from '@/contexts/AuthContext'
+import { useAuth } from '@/context/AuthContext'
 import { useToast } from '@/hooks/useToast'
 import ToastContainer from '@/components/ui/Toast'
 

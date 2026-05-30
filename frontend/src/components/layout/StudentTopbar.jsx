@@ -1,6 +1,6 @@
 import { Link, useLocation } from 'react-router-dom'
 import { Bell } from 'lucide-react'
-import { useAuth } from '@/contexts/AuthContext'
+import { useAuth } from '@/context/AuthContext'
 import logoIpb from '@/assets/logo-ipb.png'
 
 const NAV_LINKS = [

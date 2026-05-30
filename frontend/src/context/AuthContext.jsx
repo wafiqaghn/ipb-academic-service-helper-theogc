@@ -1,52 +1,85 @@
-import { createContext, useContext, useState } from 'react'
+import { createContext, useContext, useState, useEffect } from 'react'
+import axios from 'axios'
 
 const AuthContext = createContext(null)
 
-export const USERS = {
-  student: {
-    id: 'G6401231013',
-    name: 'Quina Rizky Dae Yuena Siregar',
-    initials: 'QR',
-    role: 'student',
-    email: 'quina.siregar@apps.ipb.ac.id',
-    faculty: 'FMIPA',
-    department: 'Ilmu Komputer',
-    year: 2023,
-    color: '#3B6D11',
-  },
-  staff: {
-    id: 'STAFF-2024-008',
-    name: 'Ghanianda Wafiqarifah',
-    initials: 'GW',
-    role: 'staff',
-    email: 'ghanianda@ipb.ac.id',
-    unit: 'Direktorat Akademik',
-    department: 'Pelayanan Mahasiswa',
-    color: '#2478C8',
-  },
-  admin: {
-    id: 'ADMIN-001',
-    name: 'Winanci Zahrawaini Setiawan',
-    initials: 'WZ',
-    role: 'admin',
-    email: 'winanci@ipb.ac.id',
-    unit: 'Direktorat TIK IPB',
-    color: '#BA7517',
-  },
-}
+export const api = axios.create({
+  baseURL: import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000/api/v1',
+})
 
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null)
+  const [token, setToken] = useState(localStorage.getItem('token') || null)
+  const [loading, setLoading] = useState(true)
 
-  const login = (mockToken, role, email) => {
-    setUser(USERS[role] || USERS.student)
+  useEffect(() => {
+    const requestInterceptor = api.interceptors.request.use(
+      (config) => {
+        if (token) {
+          config.headers.Authorization = `Bearer ${token}`
+        }
+        return config
+      },
+      (error) => Promise.reject(error)
+    )
+
+    const responseInterceptor = api.interceptors.response.use(
+      (response) => response,
+      (error) => {
+        if (error.response && error.response.status === 401) {
+          logout()
+        }
+        return Promise.reject(error)
+      }
+    )
+
+    return () => {
+      api.interceptors.request.eject(requestInterceptor)
+      api.interceptors.response.eject(responseInterceptor)
+    }
+  }, [token])
+
+  useEffect(() => {
+    const fetchUser = async () => {
+      if (!token) {
+        setLoading(false)
+        return
+      }
+      try {
+        const response = await api.get('/auth/me')
+        setUser(response.data)
+      } catch (error) {
+        console.error("Failed to fetch user:", error)
+        logout()
+      } finally {
+        setLoading(false)
+      }
+    }
+    fetchUser()
+  }, [token])
+
+  const login = async (email, password) => {
+    const response = await api.post('/auth/login', { email, password })
+    const { access_token } = response.data
+    setToken(access_token)
+    localStorage.setItem('token', access_token)
+    
+    const userResponse = await api.get('/auth/me', {
+      headers: { Authorization: `Bearer ${access_token}` }
+    })
+    setUser(userResponse.data)
+    return userResponse.data
   }
 
-  const logout = () => setUser(null)
+  const logout = () => {
+    setUser(null)
+    setToken(null)
+    localStorage.removeItem('token')
+  }
 
   return (
-    <AuthContext.Provider value={{ user, login, logout }}>
-      {children}
+    <AuthContext.Provider value={{ user, token, login, logout, loading }}>
+      {!loading && children}
     </AuthContext.Provider>
   )
 }
