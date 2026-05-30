@@ -3,8 +3,10 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
-from app.database.session import engine, Base
+from app.database.session import engine, Base, SessionLocal
 from app.models.user import User
+from app.models.enums import UserRole
+from app.core.security import hash_password
 from app.models.faq import FAQ
 from app.models.category import Category
 from app.models.ticket import Ticket
@@ -24,6 +26,31 @@ async def lifespan(app: FastAPI):
     Base.metadata.create_all(bind=engine)
     print("[STARTUP] Tables created successfully. Server is ready!")
 
+    print("[STARTUP] Seeding demo accounts...")
+    db = SessionLocal()
+    try:
+        demo_accounts = [
+            {"email": "quina@apps.ipb.ac.id", "name": "Quina", "password": "Password123!", "role": UserRole.mahasiswa},
+            {"email": "staff@apps.ipb.ac.id", "name": "Staff", "password": "Password123!", "role": UserRole.staff},
+            {"email": "admin@apps.ipb.ac.id", "name": "Admin", "password": "Password123!", "role": UserRole.admin}
+        ]
+        
+        for account in demo_accounts:
+            existing = db.query(User).filter(User.email == account["email"]).first()
+            if not existing:
+                new_user = User(
+                    email=account["email"],
+                    name=account["name"],
+                    hashed_password=hash_password(account["password"]),
+                    role=account["role"]
+                )
+                db.add(new_user)
+        
+        db.commit()
+        print("[STARTUP] Seeding completed.")
+    finally:
+        db.close()
+
     yield
 
     print("[SHUTDOWN] Shutting down server...")
@@ -38,7 +65,7 @@ app = FastAPI(
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=["http://localhost:5173", "http://127.0.0.1:5173", "http://localhost:3000", "http://127.0.0.1:3000", "*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

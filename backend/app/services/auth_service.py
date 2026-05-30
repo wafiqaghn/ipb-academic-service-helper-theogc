@@ -32,11 +32,17 @@ class AuthService:
         if not user or not verify_password(payload.password, user.hashed_password):
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED,
-                detail="Invalid email or password"
+                detail="Email atau password salah"
             )
 
         token = create_access_token({"sub": str(user.id)})
-        return TokenResponse(access_token=token)
+        return TokenResponse(
+            access_token=token,
+            id=user.id,
+            nama=user.name,
+            email=user.email,
+            role=user.role.value
+        )
 
     def get_me(self, user: User) -> UserResponse:
         return user
