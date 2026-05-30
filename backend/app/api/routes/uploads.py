@@ -1,5 +1,3 @@
-"""File upload routes for ticket attachments."""
-
 import os
 import uuid
 from fastapi import APIRouter, Depends, UploadFile, File, HTTPException, status
@@ -27,7 +25,6 @@ def upload_attachment(
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db),
 ) -> AttachmentResponse:
-    """Upload a supporting document to a ticket."""
     ticket = db.query(Ticket).filter(Ticket.id == ticket_id).first()
     if not ticket:
         raise HTTPException(
@@ -35,7 +32,6 @@ def upload_attachment(
             detail="Ticket not found"
         )
 
-    # Only the ticket owner or staff/admin can upload
     from app.models.enums import UserRole
     if current_user.role == UserRole.mahasiswa and ticket.created_by != current_user.id:
         raise HTTPException(
@@ -43,12 +39,10 @@ def upload_attachment(
             detail="You can only upload files to your own tickets"
         )
 
-    # Generate unique filename to avoid collisions
     ext = os.path.splitext(file.filename or "file")[1]
     unique_name = f"{uuid.uuid4().hex}{ext}"
     filepath = os.path.join(UPLOAD_DIR, unique_name)
 
-    # Save to disk
     with open(filepath, "wb") as f:
         content = file.file.read()
         f.write(content)

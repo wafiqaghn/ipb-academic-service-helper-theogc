@@ -1,5 +1,3 @@
-"""Admin dashboard routes."""
-
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 from app.database.session import get_db
@@ -20,5 +18,4 @@ def dashboard_stats(
     _: User = Depends(require_roles(UserRole.admin)),
     service: StatsService = Depends(_get_stats_service),
 ) -> dict:
-    """Admin only: get full dashboard statistics."""
     return service.get_dashboard()
