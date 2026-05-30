@@ -13,12 +13,12 @@ from app.models.ticket import Ticket
 from app.models.ticket_note import TicketNote
 from app.models.attachment import Attachment
 from app.models.discussion import Discussion, DiscussionReply
-from app.api.routes import auth, faqs, categories, tickets, uploads, discussions, admin
+
+from app.controllers import auth_controller, ticket_controller, faq_controller, category_controller
 
 UPLOAD_DIR = "uploads"
 if not os.path.exists(UPLOAD_DIR):
     os.makedirs(UPLOAD_DIR)
-
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -30,9 +30,9 @@ async def lifespan(app: FastAPI):
     db = SessionLocal()
     try:
         demo_accounts = [
-            {"email": "quina@apps.ipb.ac.id", "name": "Quina", "password": "Password123!", "role": UserRole.mahasiswa},
-            {"email": "staff@apps.ipb.ac.id", "name": "Staff", "password": "Password123!", "role": UserRole.staff},
-            {"email": "admin@apps.ipb.ac.id", "name": "Admin", "password": "Password123!", "role": UserRole.admin}
+            {"email": "quina@apps.ipb.ac.id", "nama": "Quina", "nim_or_nip": "G6401231013", "password": "Password123!", "role": UserRole.mahasiswa},
+            {"email": "staff@apps.ipb.ac.id", "nama": "Staff", "nim_or_nip": "NIP12345678", "password": "Password123!", "role": UserRole.staff},
+            {"email": "admin@apps.ipb.ac.id", "nama": "Admin", "nim_or_nip": "NIP87654321", "password": "Password123!", "role": UserRole.admin}
         ]
         
         for account in demo_accounts:
@@ -40,7 +40,8 @@ async def lifespan(app: FastAPI):
             if not existing:
                 new_user = User(
                     email=account["email"],
-                    name=account["name"],
+                    nama=account["nama"],
+                    nim_or_nip=account["nim_or_nip"],
                     hashed_password=hash_password(account["password"]),
                     role=account["role"]
                 )
@@ -48,13 +49,14 @@ async def lifespan(app: FastAPI):
         
         db.commit()
         print("[STARTUP] Seeding completed.")
+    except Exception as e:
+        print(f"[STARTUP] Seeding error: {e}")
     finally:
         db.close()
 
     yield
 
     print("[SHUTDOWN] Shutting down server...")
-
 
 app = FastAPI(
     title="IPB Academic Help Center API",
@@ -65,7 +67,7 @@ app = FastAPI(
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173", "http://127.0.0.1:5173", "http://localhost:3000", "http://127.0.0.1:3000", "*"],
+    allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -73,22 +75,16 @@ app.add_middleware(
 
 app.mount("/files", StaticFiles(directory=UPLOAD_DIR), name="files")
 
-
 @app.get("/")
 def read_root():
     return {"message": "Backend IPB Academic Help Center Berhasil Menyala!"}
-
 
 @app.get("/health")
 def health_check():
     return {"status": "healthy", "database": "connected"}
 
-
 API = "/api/v1"
-app.include_router(auth.router,         prefix=API, tags=["Authentication"])
-app.include_router(faqs.router,         prefix=API, tags=["FAQs"])
-app.include_router(categories.router,   prefix=API, tags=["Categories"])
-app.include_router(tickets.router,      prefix=API, tags=["Tickets"])
-app.include_router(uploads.router,      prefix=API, tags=["Uploads"])
-app.include_router(discussions.router,  prefix=API, tags=["Discussions"])
-app.include_router(admin.router,        prefix=API, tags=["Admin Dashboard"])
+app.include_router(auth_controller.router,       prefix=API)
+app.include_router(faq_controller.router,        prefix=API)
+app.include_router(category_controller.router,   prefix=API)
+app.include_router(ticket_controller.router,     prefix=API)

@@ -5,7 +5,6 @@ from app.database.session import get_db
 from app.models.user import User
 from app.models.enums import UserRole
 from app.core.security import decode_access_token
-from app.services.faq_service import FaqService
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/v1/auth/login")
 
@@ -45,7 +44,3 @@ def require_roles(*allowed_roles: UserRole):
             )
         return current_user
     return role_checker
-
-
-def get_faq_service(db: Session = Depends(get_db)) -> FaqService:
-    return FaqService(db)

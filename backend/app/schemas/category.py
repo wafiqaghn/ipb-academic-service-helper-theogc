@@ -4,8 +4,8 @@ from datetime import datetime
 
 
 class CategoryCreate(BaseModel):
-    name: str
-    description: Optional[str] = None
+    nama_kategori: str
+    deskripsi: Optional[str] = None
     icon: Optional[str] = "📄"
     bg_color: Optional[str] = "#F1EFE8"
     type: Optional[str] = "manual"
@@ -14,8 +14,8 @@ class CategoryCreate(BaseModel):
 
 
 class CategoryUpdate(BaseModel):
-    name: Optional[str] = None
-    description: Optional[str] = None
+    nama_kategori: Optional[str] = None
+    deskripsi: Optional[str] = None
     icon: Optional[str] = None
     bg_color: Optional[str] = None
     type: Optional[str] = None
@@ -25,8 +25,8 @@ class CategoryUpdate(BaseModel):
 
 class CategoryResponse(BaseModel):
     id: int
-    name: str
-    description: Optional[str] = None
+    nama_kategori: str
+    deskripsi: Optional[str] = None
     icon: str
     bg_color: str
     type: str

@@ -1,5 +1,6 @@
 from sqlalchemy import Column, Integer, String, Text, DateTime, ForeignKey, Enum as SQLEnum
 from sqlalchemy.sql import func
+from sqlalchemy.orm import relationship
 from app.database.session import Base
 from app.models.enums import FaqStatus
 
@@ -13,3 +14,6 @@ class FAQ(Base):
     view_count = Column(Integer, default=0, nullable=False)
     category_id = Column(Integer, ForeignKey("categories.id"), nullable=True)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
+    updated_at = Column(DateTime(timezone=True), onupdate=func.now())
+    
+    category = relationship("Category", lazy="joined")
