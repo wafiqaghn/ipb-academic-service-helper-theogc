@@ -75,7 +75,7 @@ function AppRoutes() {
       <Route
         path="/faq"
         element={
-          <RequireAuth role="student">
+          <RequireAuth role="mahasiswa">
             <FAQ />
           </RequireAuth>
         }
@@ -84,7 +84,7 @@ function AppRoutes() {
       <Route
         path="/submit"
         element={
-          <RequireAuth role="student">
+          <RequireAuth role="mahasiswa">
             <Submit />
           </RequireAuth>
         }
@@ -93,7 +93,7 @@ function AppRoutes() {
       <Route
         path="/track"
         element={
-          <RequireAuth role="student">
+          <RequireAuth role="mahasiswa">
             <Track />
           </RequireAuth>
         }
@@ -102,7 +102,7 @@ function AppRoutes() {
       <Route
         path="/generate-surat"
         element={
-          <RequireAuth role="student">
+          <RequireAuth role="mahasiswa">
             <GenerateSurat />
           </RequireAuth>
         }
@@ -111,7 +111,7 @@ function AppRoutes() {
       <Route
         path="/diskusi"
         element={
-          <RequireAuth role="student">
+          <RequireAuth role="mahasiswa">
             <DiscList />
           </RequireAuth>
         }
@@ -120,7 +120,7 @@ function AppRoutes() {
       <Route
         path="/diskusi/baru"
         element={
-          <RequireAuth role="student">
+          <RequireAuth role="mahasiswa">
             <DiscNew />
           </RequireAuth>
         }
@@ -129,7 +129,7 @@ function AppRoutes() {
       <Route
         path="/diskusi/detail"
         element={
-          <RequireAuth role="student">
+          <RequireAuth role="mahasiswa">
             <DiscDetail />
           </RequireAuth>
         }
@@ -138,7 +138,7 @@ function AppRoutes() {
       <Route
         path="/notifikasi"
         element={
-          <RequireAuth role="student">
+          <RequireAuth role="mahasiswa">
             <Notifications />
           </RequireAuth>
         }
@@ -147,7 +147,7 @@ function AppRoutes() {
       <Route
         path="/profil"
         element={
-          <RequireAuth role="student">
+          <RequireAuth role="mahasiswa">
             <StudentProfile />
           </RequireAuth>
         }
