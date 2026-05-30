@@ -1,5 +1,3 @@
-"""Ticket routes: user submit/track + staff process/filter."""
-
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 from app.database.session import get_db
@@ -19,15 +17,12 @@ def _get_ticket_service(db: Session = Depends(get_db)) -> TicketService:
     return TicketService(db)
 
 
-# ── User Endpoints ──────────────────────────────────────
-
 @router.post("", response_model=TicketBrief)
 def create_ticket(
     payload: TicketCreate,
     current_user: User = Depends(get_current_user),
     service: TicketService = Depends(_get_ticket_service),
 ) -> TicketBrief:
-    """Submit a new service request."""
     ticket = service.create(current_user, payload)
     return ticket
 
@@ -40,7 +35,6 @@ def my_tickets(
     current_user: User = Depends(get_current_user),
     service: TicketService = Depends(_get_ticket_service),
 ) -> list[TicketBrief]:
-    """Track my own service requests."""
     return service.list_my_tickets(current_user, status, skip, limit)
 
 
@@ -50,13 +44,9 @@ def get_ticket(
     current_user: User = Depends(get_current_user),
     service: TicketService = Depends(_get_ticket_service),
 ) -> TicketResponse:
-    """View ticket details (user sees own, staff/admin sees all)."""
     ticket = service.get_detail(ticket_id, current_user)
-    # Build response with nested names
     return _ticket_to_response(ticket)
 
-
-# ── Staff / Admin Endpoints ────────────────────────────
 
 @router.get("", response_model=list[TicketBrief])
 def list_all_tickets(
@@ -69,7 +59,6 @@ def list_all_tickets(
     _: User = Depends(require_roles(UserRole.staff, UserRole.admin)),
     service: TicketService = Depends(_get_ticket_service),
 ) -> list[TicketBrief]:
-    """Staff/Admin: list all tickets with filters."""
     return service.list_all(status, priority, category_id, assigned_to, skip, limit)
 
 
@@ -80,11 +69,8 @@ def update_ticket(
     _: User = Depends(require_roles(UserRole.staff, UserRole.admin)),
     service: TicketService = Depends(_get_ticket_service),
 ) -> TicketBrief:
-    """Staff/Admin: update ticket status, priority, or assignment."""
     return service.update(ticket_id, payload)
 
-
-# ── Notes ───────────────────────────────────────────────
 
 @router.post("/{ticket_id}/notes", response_model=TicketNoteResponse)
 def add_note(
@@ -93,7 +79,6 @@ def add_note(
     current_user: User = Depends(require_roles(UserRole.staff, UserRole.admin)),
     service: TicketService = Depends(_get_ticket_service),
 ) -> TicketNoteResponse:
-    """Staff/Admin: add a note to a ticket."""
     note = service.add_note(ticket_id, current_user, payload)
     return TicketNoteResponse(
         id=note.id,
@@ -111,7 +96,6 @@ def list_notes(
     _: User = Depends(require_roles(UserRole.staff, UserRole.admin)),
     service: TicketService = Depends(_get_ticket_service),
 ) -> list[TicketNoteResponse]:
-    """Staff/Admin: view all notes on a ticket."""
     notes = service.list_notes(ticket_id)
     return [
         TicketNoteResponse(
@@ -125,8 +109,6 @@ def list_notes(
         for n in notes
     ]
 
-
-# ── Helpers ─────────────────────────────────────────────
 
 def _ticket_to_response(ticket) -> TicketResponse:
     return TicketResponse(

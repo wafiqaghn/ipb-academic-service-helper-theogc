@@ -1,5 +1,3 @@
-"""Discussion forum routes."""
-
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 from app.database.session import get_db
@@ -24,7 +22,6 @@ def create_discussion(
     current_user: User = Depends(get_current_user),
     service: DiscussionService = Depends(_get_discussion_service),
 ) -> DiscussionResponse:
-    """Open a new discussion thread on an FAQ."""
     discussion = service.create_thread(current_user, payload)
     return DiscussionResponse(
         id=discussion.id,
@@ -42,7 +39,6 @@ def list_discussions(
     faq_id: int,
     service: DiscussionService = Depends(_get_discussion_service),
 ) -> list[DiscussionResponse]:
-    """List all discussion threads for a specific FAQ."""
     discussions = service.list_by_faq(faq_id)
     return [
         DiscussionResponse(
@@ -65,7 +61,6 @@ def add_reply(
     current_user: User = Depends(get_current_user),
     service: DiscussionService = Depends(_get_discussion_service),
 ) -> ReplyResponse:
-    """Reply to a discussion thread."""
     reply = service.add_reply(discussion_id, current_user, payload)
     return ReplyResponse(
         id=reply.id,
@@ -82,7 +77,6 @@ def list_replies(
     discussion_id: int,
     service: DiscussionService = Depends(_get_discussion_service),
 ) -> list[ReplyResponse]:
-    """Get all replies for a discussion thread."""
     replies = service.list_replies(discussion_id)
     return [
         ReplyResponse(

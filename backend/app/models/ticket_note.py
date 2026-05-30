@@ -13,6 +13,5 @@ class TicketNote(Base):
     content = Column(Text, nullable=False)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
 
-    # Relationships
     ticket = relationship("Ticket", back_populates="notes")
     author = relationship("User", lazy="joined")

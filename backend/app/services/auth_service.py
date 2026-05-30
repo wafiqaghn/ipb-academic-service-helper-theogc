@@ -10,7 +10,6 @@ class AuthService:
         self.db = db
 
     def register(self, payload: RegisterRequest) -> UserResponse:
-        # Check if email is already taken
         existing = self.db.query(User).filter(User.email == payload.email).first()
         if existing:
             raise HTTPException(

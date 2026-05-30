@@ -11,7 +11,6 @@ class DiscussionService:
         self.db = db
 
     def create_thread(self, user: User, payload: DiscussionCreate) -> Discussion:
-        # Verify FAQ exists
         faq = self.db.query(FAQ).filter(FAQ.id == payload.faq_id).first()
         if not faq:
             raise HTTPException(
@@ -47,7 +46,6 @@ class DiscussionService:
         return discussion
 
     def add_reply(self, discussion_id: int, user: User, payload: ReplyCreate) -> DiscussionReply:
-        # Verify discussion exists
         discussion = self.get_thread(discussion_id)
 
         reply = DiscussionReply(
@@ -61,7 +59,6 @@ class DiscussionService:
         return reply
 
     def list_replies(self, discussion_id: int) -> list[DiscussionReply]:
-        # Verify discussion exists
         self.get_thread(discussion_id)
         return (
             self.db.query(DiscussionReply)

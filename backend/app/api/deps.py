@@ -36,7 +36,6 @@ def get_current_user(
     return user
 
 
-# Dependency to restrict access to specific roles (like Admin/Staff)
 def require_roles(*allowed_roles: UserRole):
     def role_checker(current_user: User = Depends(get_current_user)) -> User:
         if current_user.role not in allowed_roles:
@@ -48,6 +47,5 @@ def require_roles(*allowed_roles: UserRole):
     return role_checker
 
 
-# Dependency to inject the FaqService into routers
 def get_faq_service(db: Session = Depends(get_db)) -> FaqService:
     return FaqService(db)

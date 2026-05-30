@@ -3,8 +3,6 @@ from typing import Optional
 from datetime import datetime
 
 
-# ── Discussion ──────────────────────────────────────────
-
 class DiscussionCreate(BaseModel):
     faq_id: int
     content: str
@@ -22,8 +20,6 @@ class DiscussionResponse(BaseModel):
     class Config:
         from_attributes = True
 
-
-# ── Discussion Reply ────────────────────────────────────
 
 class ReplyCreate(BaseModel):
     content: str

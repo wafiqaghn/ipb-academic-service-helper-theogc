@@ -1,26 +1,27 @@
 from pydantic import BaseModel
-from typing import Optional
-from datetime import datetime
+from typing import Optional, Dict, Any
+from datetime import datetime, date
 from app.models.enums import TicketStatus, TicketPriority, UserRole
 
-
-# ── Ticket ──────────────────────────────────────────────
 
 class TicketCreate(BaseModel):
     subject: str
     description: str
     category_id: Optional[int] = None
     priority: Optional[TicketPriority] = TicketPriority.medium
+    deadline: Optional[date] = None
+    form_data: Optional[Dict[str, Any]] = None
 
 
 class TicketUpdate(BaseModel):
     status: Optional[TicketStatus] = None
     priority: Optional[TicketPriority] = None
     assigned_to: Optional[int] = None
+    deadline: Optional[date] = None
+    form_data: Optional[Dict[str, Any]] = None
 
 
 class TicketBrief(BaseModel):
-    """Lightweight ticket representation for list views."""
     id: int
     subject: str
     status: TicketStatus
@@ -28,14 +29,14 @@ class TicketBrief(BaseModel):
     category_id: Optional[int] = None
     created_by: int
     assigned_to: Optional[int] = None
+    deadline: Optional[date] = None
+    form_data: Optional[Dict[str, Any]] = None
     created_at: Optional[datetime] = None
     updated_at: Optional[datetime] = None
 
     class Config:
         from_attributes = True
 
-
-# ── Ticket Notes ────────────────────────────────────────
 
 class TicketNoteCreate(BaseModel):
     content: str
@@ -53,8 +54,6 @@ class TicketNoteResponse(BaseModel):
         from_attributes = True
 
 
-# ── Attachment ──────────────────────────────────────────
-
 class AttachmentResponse(BaseModel):
     id: int
     ticket_id: int
@@ -65,8 +64,6 @@ class AttachmentResponse(BaseModel):
     class Config:
         from_attributes = True
 
-
-# ── Full Ticket Detail ─────────────────────────────────
 
 class TicketResponse(BaseModel):
     id: int
@@ -79,6 +76,8 @@ class TicketResponse(BaseModel):
     creator_name: Optional[str] = None
     assigned_to: Optional[int] = None
     assignee_name: Optional[str] = None
+    deadline: Optional[date] = None
+    form_data: Optional[Dict[str, Any]] = None
     created_at: Optional[datetime] = None
     updated_at: Optional[datetime] = None
     notes: list[TicketNoteResponse] = []

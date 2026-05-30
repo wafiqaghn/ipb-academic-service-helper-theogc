@@ -4,8 +4,6 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from app.database.session import engine, Base
-
-# Import ALL models so Base.metadata.create_all() discovers them
 from app.models.user import User
 from app.models.faq import FAQ
 from app.models.category import Category
@@ -13,11 +11,8 @@ from app.models.ticket import Ticket
 from app.models.ticket_note import TicketNote
 from app.models.attachment import Attachment
 from app.models.discussion import Discussion, DiscussionReply
-
-# Import all routers
 from app.api.routes import auth, faqs, categories, tickets, uploads, discussions, admin
 
-# Uploads folder
 UPLOAD_DIR = "uploads"
 if not os.path.exists(UPLOAD_DIR):
     os.makedirs(UPLOAD_DIR)
@@ -34,7 +29,6 @@ async def lifespan(app: FastAPI):
     print("[SHUTDOWN] Shutting down server...")
 
 
-# INISIALISASI FASTAPI
 app = FastAPI(
     title="IPB Academic Help Center API",
     description="Backend IPB Academic Help Center API",
@@ -42,7 +36,6 @@ app = FastAPI(
     lifespan=lifespan,
 )
 
-# CORS MIDDLEWARE
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -51,11 +44,8 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# MOUNT FILE STATIS
 app.mount("/files", StaticFiles(directory=UPLOAD_DIR), name="files")
 
-
-# ── Health & Root ───────────────────────────────────────
 
 @app.get("/")
 def read_root():
@@ -66,8 +56,6 @@ def read_root():
 def health_check():
     return {"status": "healthy", "database": "connected"}
 
-
-# ── Register All Routers ───────────────────────────────
 
 API = "/api/v1"
 app.include_router(auth.router,         prefix=API, tags=["Authentication"])

@@ -21,7 +21,6 @@ class CategoryService:
         return category
 
     def create(self, payload: CategoryCreate) -> Category:
-        # Check uniqueness
         existing = self.db.query(Category).filter(Category.name == payload.name).first()
         if existing:
             raise HTTPException(

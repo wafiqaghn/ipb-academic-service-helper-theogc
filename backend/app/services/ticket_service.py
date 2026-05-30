@@ -11,22 +11,20 @@ class TicketService:
     def __init__(self, db: Session):
         self.db = db
 
-    # ── Create ──────────────────────────────────────────
-
     def create(self, user: User, payload: TicketCreate) -> Ticket:
         ticket = Ticket(
             subject=payload.subject,
             description=payload.description,
             category_id=payload.category_id,
             priority=payload.priority,
+            deadline=payload.deadline,
+            form_data=payload.form_data,
             created_by=user.id,
         )
         self.db.add(ticket)
         self.db.commit()
         self.db.refresh(ticket)
         return ticket
-
-    # ── List My Tickets (for students) ──────────────────
 
     def list_my_tickets(
         self,
@@ -40,8 +38,6 @@ class TicketService:
             query = query.filter(Ticket.status == status_filter)
         return query.order_by(Ticket.created_at.desc()).offset(skip).limit(limit).all()
 
-    # ── Get Detail ──────────────────────────────────────
-
     def get_detail(self, ticket_id: int, user: User) -> Ticket:
         ticket = self.db.query(Ticket).filter(Ticket.id == ticket_id).first()
         if not ticket:
@@ -49,15 +45,12 @@ class TicketService:
                 status_code=status.HTTP_404_NOT_FOUND,
                 detail="Ticket not found"
             )
-        # Students can only view their own tickets
         if user.role == UserRole.mahasiswa and ticket.created_by != user.id:
             raise HTTPException(
                 status_code=status.HTTP_403_FORBIDDEN,
                 detail="You can only view your own tickets"
             )
         return ticket
-
-    # ── List All (Staff/Admin) ──────────────────────────
 
     def list_all(
         self,
@@ -79,8 +72,6 @@ class TicketService:
             query = query.filter(Ticket.assigned_to == assigned_to)
         return query.order_by(Ticket.created_at.desc()).offset(skip).limit(limit).all()
 
-    # ── Update (Staff/Admin) ────────────────────────────
-
     def update(self, ticket_id: int, payload: TicketUpdate) -> Ticket:
         ticket = self.db.query(Ticket).filter(Ticket.id == ticket_id).first()
         if not ticket:
@@ -95,10 +86,7 @@ class TicketService:
         self.db.refresh(ticket)
         return ticket
 
-    # ── Notes ───────────────────────────────────────────
-
     def add_note(self, ticket_id: int, user: User, payload: TicketNoteCreate) -> TicketNote:
-        # Verify ticket exists
         ticket = self.db.query(Ticket).filter(Ticket.id == ticket_id).first()
         if not ticket:
             raise HTTPException(

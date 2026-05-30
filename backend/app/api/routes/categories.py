@@ -1,5 +1,3 @@
-"""Category routes: public list + admin CRUD."""
-
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 from app.database.session import get_db
@@ -20,7 +18,6 @@ def _get_category_service(db: Session = Depends(get_db)) -> CategoryService:
 def list_categories(
     service: CategoryService = Depends(_get_category_service),
 ) -> list[CategoryResponse]:
-    """Public: list all categories."""
     return service.list_all()
 
 
@@ -30,7 +27,6 @@ def create_category(
     _: User = Depends(require_roles(UserRole.admin)),
     service: CategoryService = Depends(_get_category_service),
 ) -> CategoryResponse:
-    """Admin only: create a new category."""
     return service.create(payload)
 
 
@@ -41,7 +37,6 @@ def update_category(
     _: User = Depends(require_roles(UserRole.admin)),
     service: CategoryService = Depends(_get_category_service),
 ) -> CategoryResponse:
-    """Admin only: update a category."""
     return service.update(category_id, payload)
 
 
@@ -51,5 +46,4 @@ def delete_category(
     _: User = Depends(require_roles(UserRole.admin)),
     service: CategoryService = Depends(_get_category_service),
 ) -> dict:
-    """Admin only: delete a category."""
     return service.delete(category_id)
