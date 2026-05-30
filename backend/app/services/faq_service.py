@@ -17,7 +17,6 @@ class FaqService:
         return query.offset(skip).limit(limit).all()
 
     def popular(self):
-        # Fetch the top 5 most viewed published FAQs
         return self.db.query(FAQ).filter(FAQ.status == FaqStatus.published).order_by(FAQ.view_count.desc()).limit(5).all()
 
     def bump_popular(self, faq_id: int):
@@ -48,7 +47,6 @@ class FaqService:
         if not faq:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="FAQ not found")
         
-        # Only update fields that were actually provided in the request
         update_data = payload.model_dump(exclude_unset=True)
         for key, value in update_data.items():
             setattr(faq, key, value)
