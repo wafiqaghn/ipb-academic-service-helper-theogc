@@ -10,10 +10,9 @@ class Category(Base):
     name = Column(String, unique=True, nullable=False)
     description = Column(Text, nullable=True)
     
-    # New fields for frontend alignment
     icon = Column(String, default="📄", nullable=False)
     bg_color = Column(String, default="#F1EFE8", nullable=False)
-    type = Column(String, default="manual", nullable=False)  # 'manual' or 'generate'
+    type = Column(String, default="manual", nullable=False)
     template = Column(Text, nullable=True)
     ttd = Column(String, nullable=True)
 

@@ -17,14 +17,12 @@ class Ticket(Base):
     created_by = Column(Integer, ForeignKey("users.id"), nullable=False)
     assigned_to = Column(Integer, ForeignKey("users.id"), nullable=True)
     
-    # New fields for frontend alignment
     deadline = Column(Date, nullable=True)
     form_data = Column(JSON, nullable=True)
 
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())
 
-    # Relationships
     creator = relationship("User", foreign_keys=[created_by], lazy="joined")
     assignee = relationship("User", foreign_keys=[assigned_to], lazy="joined")
     category = relationship("Category", lazy="joined")
