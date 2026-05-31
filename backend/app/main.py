@@ -30,11 +30,11 @@ async def lifespan(app: FastAPI):
     db = SessionLocal()
     try:
         demo_accounts = [
-            {"email": "quina@apps.ipb.ac.id", "nama": "Quina", "nim_or_nip": "G6401231013", "password": "Password123!", "role": UserRole.mahasiswa},
-            {"email": "staff@apps.ipb.ac.id", "nama": "Staff", "nim_or_nip": "NIP12345678", "password": "Password123!", "role": UserRole.staff},
-            {"email": "admin@apps.ipb.ac.id", "nama": "Admin", "nim_or_nip": "NIP87654321", "password": "Password123!", "role": UserRole.admin}
+            {"email": "quina@apps.ipb.ac.id", "nama": "Quina Rizky", "nim_or_nip": "G6401231013", "password": "Password123!", "role": UserRole.mahasiswa},
+            {"email": "staff@apps.ipb.ac.id", "nama": "Budi Santoso", "nim_or_nip": "NIP198512101987031002", "password": "Password123!", "role": UserRole.staff},
+            {"email": "admin@apps.ipb.ac.id", "nama": "Ghanianda W.", "nim_or_nip": "NIP196803101993021001", "password": "Password123!", "role": UserRole.admin}
         ]
-        
+
         for account in demo_accounts:
             existing = db.query(User).filter(User.email == account["email"]).first()
             if not existing:
@@ -46,11 +46,57 @@ async def lifespan(app: FastAPI):
                     role=account["role"]
                 )
                 db.add(new_user)
-        
+
         db.commit()
-        print("[STARTUP] Seeding completed.")
+        print("[STARTUP] Demo accounts seeded successfully.")
+
+        demo_categories = [
+            {"nama_kategori": "Transkip & Legalisir", "deskripsi": "Permintaan transkip nilai dan legalisir ijazah", "icon": "📜", "bg_color": "#FFF8DC"},
+            {"nama_kategori": "Surat Keterangan", "deskripsi": "Surat keterangan akademik dan status mahasiswa", "icon": "📋", "bg_color": "#E6F2FF"},
+            {"nama_kategori": "Beasiswa & KRS", "deskripsi": "Pengurusan berkas beasiswa dan kartu rencana studi", "icon": "🎓", "bg_color": "#F0FFF4"},
+            {"nama_kategori": "Legalisir Ijazah", "deskripsi": "Layanan legalisir dokumen ijazah", "icon": "📜", "bg_color": "#FFF5E6"},
+            {"nama_kategori": "Lainnya", "deskripsi": "Layanan akademik lainnya", "icon": "📎", "bg_color": "#F5F5F5"},
+        ]
+
+        for cat in demo_categories:
+            existing = db.query(Category).filter(Category.nama_kategori == cat["nama_kategori"]).first()
+            if not existing:
+                new_cat = Category(
+                    nama_kategori=cat["nama_kategori"],
+                    deskripsi=cat["deskripsi"],
+                    icon=cat["icon"],
+                    bg_color=cat["bg_color"]
+                )
+                db.add(new_cat)
+
+        db.commit()
+        print("[STARTUP] Demo categories seeded successfully.")
+
+        demo_faqs = [
+            {"question": "Berapa lama waktu pembuatan surat keterangan?", "answer": "Waktu pembuatan surat keterangan biasanya 1-3 hari kerja tergantung pada jenis surat dan beban kerja staff akademik.", "category_id": 2, "status": "published"},
+            {"question": "Apa saja dokumen yang diperlukan untuk transkip?", "answer": "Untuk membuat transkip, Anda hanya perlu menyertakan KTM aktif dan mengisi formulir permohonan. Dokumen lain akan diproses oleh bagian akademik.", "category_id": 1, "status": "published"},
+            {"question": "Bagaimana cara mengurus legalisir ijazah?", "answer": "Legalisir ijazah dapat dilakukan dengan datang langsung ke bagian akademik membawa ijazah asli dan fotokopi identitas. Biaya legalisir adalah Rp 10.000 per lembar.", "category_id": 4, "status": "published"},
+            {"question": "Apakah ada biaya untuk pembuatan surat keterangan?", "answer": "Surat keterangan statusstudi gratis untuk mahasiswa IPB. Namun, untuk surat keterangan khusus atau lebih dari 5 lembar, ada biaya admin Rp 5.000 per lembar tambahan.", "category_id": 2, "status": "published"},
+            {"question": "Bagaimana jika deadline saya mendesak?", "answer": "Anda dapat menandai permohonan sebagai mendesak saat membuat tiket. Tim staff akan mempriorraskan layanan Anda berdasarkan urgensi dan ketersediaan.", "category_id": 5, "status": "published"},
+        ]
+
+        for faq in demo_faqs:
+            existing = db.query(FAQ).filter(FAQ.question == faq["question"]).first()
+            if not existing:
+                new_faq = FAQ(
+                    question=faq["question"],
+                    answer=faq["answer"],
+                    category_id=faq.get("category_id"),
+                    status=faq["status"]
+                )
+                db.add(new_faq)
+
+        db.commit()
+        print("[STARTUP] Demo FAQs seeded successfully.")
+
     except Exception as e:
         print(f"[STARTUP] Seeding error: {e}")
+        db.rollback()
     finally:
         db.close()
 

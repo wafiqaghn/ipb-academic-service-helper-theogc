@@ -16,12 +16,14 @@ class TokenResponse(BaseModel):
     id: int
     nama: str
     email: str
+    nim_or_nip: str | None = None
     role: str
 
 class UserResponse(BaseModel):
     id: int
     email: str
     nama: str
+    nim_or_nip: str | None = None
     role: UserRole
 
     class Config:

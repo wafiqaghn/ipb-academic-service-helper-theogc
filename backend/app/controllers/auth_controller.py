@@ -44,6 +44,7 @@ def login(payload: LoginRequest, db: Session = Depends(get_db)):
             id=user.id,
             nama=user.nama,
             email=user.email,
+            nim_or_nip=user.nim_or_nip,
             role=user.role.value
         )
     except SQLAlchemyError as e:

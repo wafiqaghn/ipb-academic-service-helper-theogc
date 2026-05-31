@@ -1,5 +1,5 @@
 from fastapi import APIRouter, Depends, HTTPException, status
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, joinedload
 from sqlalchemy.exc import SQLAlchemyError
 from app.database.session import get_db
 from app.api.deps import get_current_user, require_roles
@@ -42,13 +42,14 @@ def get_my_tickets(
     db: Session = Depends(get_db),
 ):
     try:
-        tickets = db.query(Ticket).filter(Ticket.student_id == current_user.id).all()
+        tickets = db.query(Ticket).filter(Ticket.student_id == current_user.id).options(
+            joinedload(Ticket.student),
+            joinedload(Ticket.category)
+        ).all()
         return tickets
     except SQLAlchemyError as e:
         raise HTTPException(status_code=500, detail=f"Database error: {str(e)}")
 
-
-from sqlalchemy.orm import joinedload
 
 @router.get("/all", response_model=List[TicketBrief])
 def get_all_tickets(
@@ -72,10 +73,14 @@ def get_ticket_detail(
     db: Session = Depends(get_db),
 ):
     try:
-        ticket = db.query(Ticket).filter(Ticket.id == ticket_id).first()
+        ticket = db.query(Ticket).filter(Ticket.id == ticket_id).options(
+            joinedload(Ticket.student),
+            joinedload(Ticket.staff),
+            joinedload(Ticket.category)
+        ).first()
         if not ticket:
             raise HTTPException(status_code=404, detail="Ticket not found")
-        
+
         if current_user.role == UserRole.mahasiswa and ticket.student_id != current_user.id:
             raise HTTPException(status_code=403, detail="Not authorized to view this ticket")
 
@@ -110,20 +115,41 @@ def update_ticket_status(
         ticket = db.query(Ticket).filter(Ticket.id == ticket_id).first()
         if not ticket:
             raise HTTPException(status_code=404, detail="Ticket not found")
-        
+
         if payload.status:
             ticket.status = payload.status
         if payload.staff_id:
             ticket.staff_id = payload.staff_id
         if payload.priority:
             ticket.priority = payload.priority
-        
+
         if not ticket.staff_id and payload.status and payload.status != TicketStatus.open:
             ticket.staff_id = current_user.id
 
         db.commit()
         db.refresh(ticket)
         return ticket
+    except SQLAlchemyError as e:
+        db.rollback()
+        raise HTTPException(status_code=500, detail=f"Database error: {str(e)}")
+
+
+@router.delete("/{ticket_id}", status_code=status.HTTP_204_NO_CONTENT)
+def delete_ticket(
+    ticket_id: int,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    try:
+        ticket = db.query(Ticket).filter(Ticket.id == ticket_id).first()
+        if not ticket:
+            raise HTTPException(status_code=404, detail="Ticket not found")
+
+        if current_user.role == UserRole.mahasiswa and ticket.student_id != current_user.id:
+            raise HTTPException(status_code=403, detail="Not authorized to delete this ticket")
+
+        db.delete(ticket)
+        db.commit()
     except SQLAlchemyError as e:
         db.rollback()
         raise HTTPException(status_code=500, detail=f"Database error: {str(e)}")

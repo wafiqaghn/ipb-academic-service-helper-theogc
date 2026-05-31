@@ -1,5 +1,6 @@
 from pydantic import BaseModel
 from typing import Optional
+from datetime import datetime
 from app.models.enums import FaqStatus
 
 class FaqBase(BaseModel):
@@ -20,6 +21,7 @@ class FaqUpdate(BaseModel):
 class FaqResponse(FaqBase):
     id: int
     view_count: int
+    created_at: Optional[datetime] = None
 
     class Config:
         from_attributes = True

@@ -11,9 +11,9 @@ class FaqStatus(str, enum.Enum):
     archived = "archived"
 
 class TicketStatus(str, enum.Enum):
-    open = "Open"
-    in_progress = "In Progress"
-    resolved = "Resolved"
+    open = "open"
+    progress = "progress"
+    resolved = "resolved"
 
 class TicketPriority(str, enum.Enum):
     low = "low"
